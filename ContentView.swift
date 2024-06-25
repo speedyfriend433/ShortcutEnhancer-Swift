@@ -70,20 +70,15 @@ struct ContentView: View {
     }
     
     func checkTriggers() {
-        // 위치 기반 트리거
         if let location = locationManager.currentLocation {
-            // 예시: 특정 위치에 도달했을 때 단축어 실행
             if location.distance(from: CLLocation(latitude: 37.7749, longitude: -122.4194)) < 100 {
-                // 특정 단축어 실행
                 if let shortcut = viewModel.shortcuts.first(where: { $0.name == "Location Trigger" }) {
                     viewModel.executeShortcut(shortcut)
                 }
             }
         }
 
-        // 배터리 상태 기반 트리거
         if batteryMonitor.batteryState == .unplugged && batteryMonitor.batteryLevel < 0.2 {
-            // 예시: 배터리 잔량이 20% 미만일 때 단축어 실행
             if let shortcut = viewModel.shortcuts.first(where: { $0.name == "Low Battery Trigger" }) {
                 viewModel.executeShortcut(shortcut)
             }
