@@ -62,7 +62,7 @@ class ShortcutViewModel: ObservableObject {
                     showAlert(message: message)
                 }
             case .custom:
-                // 커스텀 액션 처리
+                // custom action
                 break
             }
         }
