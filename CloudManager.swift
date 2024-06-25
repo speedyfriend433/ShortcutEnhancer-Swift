@@ -8,7 +8,12 @@ import CloudKit
 import Combine
 
 class CloudManager: ObservableObject {
-    private var database = CKContainer.default().privateCloudDatabase
+    private var database: CKDatabase
+
+    init() {
+        let container = CKContainer.default()
+        self.database = container.privateCloudDatabase
+    }
 
     func saveShortcut(_ shortcut: Shortcut) {
         let record = CKRecord(recordType: "Shortcut")
@@ -17,7 +22,7 @@ class CloudManager: ObservableObject {
 
         database.save(record) { record, error in
             if let error = error {
-                print("Error saving to CloudKit: \(error)")
+                print("Error saving in CloudKit: \(error.localizedDescription)")
             }
         }
     }
@@ -28,13 +33,21 @@ class CloudManager: ObservableObject {
         
         var fetchedRecords: [CKRecord] = []
         
-        operation.recordFetchedBlock = { record in
-            fetchedRecords.append(record)
+        operation.recordMatchedBlock = { recordID, recordResult in
+            switch recordResult {
+            case .success(let record):
+                fetchedRecords.append(record)
+            case .failure(let error):
+                print("Error while importing records: \(error.localizedDescription)")
+            }
         }
         
-        operation.queryCompletionBlock = { cursor, error in
-            if let error = error {
-                print("Error fetching from CloudKit: \(error)")
+        operation.queryResultBlock = { result in
+            switch result {
+            case .success(_):
+                break
+            case .failure(let error):
+                print("Error importing from CloudKit: \(error.localizedDescription)")
                 completion([])
                 return
             }
